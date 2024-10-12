@@ -174,55 +174,68 @@ namespace Calculator
             List<string> symbols = new List<string>(symbolsBad);
             symbols.RemoveAt(0);
 
-            for (int i = 0; i < symbols.Count; i++)
+            try
             {
-                if (CheckWhatKindOfElement(symbols[i]) == "isOperator")
+                for (int i = 0; i < symbols.Count; i++)
                 {
-                    double result;
-                    if (symbols[i] == "*")
+                    if (CheckWhatKindOfElement(symbols[i]) == "isOperator")
                     {
-                        result = double.Parse(symbols[i - 1]) * double.Parse(symbols[i + 1]);
-                        symbols[i - 1] = result.ToString();
+                        double result;
+                        if (symbols[i] == "*")
+                        {
+                            result = double.Parse(symbols[i - 1]) * double.Parse(symbols[i + 1]);
+                            symbols[i - 1] = result.ToString();
 
-                        symbols.RemoveAt(i + 1);
-                        symbols.RemoveAt(i);
-                    }
-                    else if (symbols[i] == "/")
-                    {
-                        result = double.Parse(symbols[i - 1]) / double.Parse(symbols[i + 1]);
-                        symbols[i - 1] = result.ToString();
+                            symbols.RemoveAt(i + 1);
+                            symbols.RemoveAt(i);
+                        }
+                        else if (symbols[i] == "/")
+                        {
+                            if (double.Parse(symbols[i + 1]) == 0.0)
+                                throw new DivideByZeroException();
 
-                        symbols.RemoveAt(i + 1);
-                        symbols.RemoveAt(i);
+                            result = double.Parse(symbols[i - 1]) / double.Parse(symbols[i + 1]);
+                            symbols[i - 1] = result.ToString();
+
+                            symbols.RemoveAt(i + 1);
+                            symbols.RemoveAt(i);
+                        }
                     }
                 }
-            }
-            for (int i = 0; i < symbols.Count; i++)
-            {
-                if (CheckWhatKindOfElement(symbols[i]) == "isOperator")
+                for (int i = 0; i < symbols.Count; i++)
                 {
-                    double result;
-                    if (symbols[i] == "+")
+                    if (CheckWhatKindOfElement(symbols[i]) == "isOperator")
                     {
-                        result = double.Parse(symbols[i - 1]) + double.Parse(symbols[i + 1]);
-                        symbols[i - 1] = result.ToString();
+                        double result;
+                        if (symbols[i] == "+")
+                        {
+                            result = double.Parse(symbols[i - 1]) + double.Parse(symbols[i + 1]);
+                            symbols[i - 1] = result.ToString();
 
-                        symbols.RemoveAt(i + 1);
-                        symbols.RemoveAt(i);
-                    }
-                    else if (symbols[i] == "-")
-                    {
-                        result = double.Parse(symbols[i - 1]) - double.Parse(symbols[i + 1]);
-                        symbols[i - 1] = result.ToString();
+                            symbols.RemoveAt(i + 1);
+                            symbols.RemoveAt(i);
+                        }
+                        else if (symbols[i] == "-")
+                        {
+                            result = double.Parse(symbols[i - 1]) - double.Parse(symbols[i + 1]);
+                            symbols[i - 1] = result.ToString();
 
-                        symbols.RemoveAt(i + 1);
-                        symbols.RemoveAt(i);
+                            symbols.RemoveAt(i + 1);
+                            symbols.RemoveAt(i);
+                        }
                     }
                 }
-            }
 
-            equals_Pressed = true;
-            Display = symbols[0];
+                Display = symbols[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                equals_Pressed = true;
+            }
         }
     }
 }
