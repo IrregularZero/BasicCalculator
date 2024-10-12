@@ -19,7 +19,7 @@ namespace Calculator
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private bool equals_Pressed;
+        private bool equals_Pressed; // If equals is pressed display should be cleared with next press of the button
 
         private string display;
 
@@ -41,10 +41,10 @@ namespace Calculator
 
         public MainWindow()
         {
-            DataContext = this;
+            DataContext = this; // Setting this script as data context for the window so that PropertyChanged actually works
             InitializeComponent();
 
-            display = " ";
+            display = " "; // Just an empty form of string needed for code
             equals_Pressed = false;
         }
         private void OnPropertyChanged(string propertyName)
@@ -90,12 +90,14 @@ namespace Calculator
 
         public void Numpad_OnClick(object sender, RoutedEventArgs e)
         {
+            // After Equals was pressed this part works out and clears display
             if (equals_Pressed)
             {
                 Display = " ";
                 equals_Pressed = false;
             }
 
+            // Element is equals to a content in a button pressed
             string element = string.Empty;
             if (e is not null)
             {
@@ -108,6 +110,16 @@ namespace Calculator
 
             string elementType = CheckWhatKindOfElement(element);
 
+            // Depending on Element it's placement conditions differ
+            /*
+             Operator can be placed if:
+                    not the first symbol
+                    not placed before dot or other operator
+             Dot can be placed if:
+                    not placed before Operator and another Dot
+                Also if placed first 0 will be placed before it
+             Number can be placed without any conditions.
+             */
             switch (elementType)
             {
                 case "isOperator": 
@@ -115,10 +127,10 @@ namespace Calculator
                     {
                         return;
                     }
-                    else if (display.Length == 2)
+                    else if (display.Length == 2) // Needed extra check, becouse there was bug if there wasn't
                     {
-                        if (CheckWhatKindOfElement(display[0].ToString()) != "isOperator" 
-                            && CheckWhatKindOfElement(display[0].ToString()) != "isDot")
+                        if (CheckWhatKindOfElement(display[1].ToString()) != "isOperator" 
+                            && CheckWhatKindOfElement(display[1].ToString()) != "isDot")
                         {
                             Display += ' ';
                             Display += element;
@@ -166,10 +178,25 @@ namespace Calculator
         public void Clear_OnClick(object sender, RoutedEventArgs e)
         {
             Display = " ";
-            equals_Pressed = false;
+            equals_Pressed = false; // Since we already cleared no need in it even after equal sign was pressed
         }
         public void Equals_OnClick(object sender, RoutedEventArgs e)
         {
+            /*
+             The idia behind code:
+                    First it searches for the operator in a string divided by spaces,
+                    then it takes number before it and after it and makes operation,
+                    according to opperator they were found under.
+                    Sets result in first value's place and deletes operator along with second value.
+                    Operation continues for the amount of operators in equation.
+             Example:
+                    1. 2 + 2 * 2
+                    2. 2 + 4
+                    3. 6
+             Output: 6
+             */
+
+            // Dividing symbols by space
             string[] symbolsBad = display.Split(' ');
             List<string> symbols = new List<string>(symbolsBad);
             symbols.RemoveAt(0);
